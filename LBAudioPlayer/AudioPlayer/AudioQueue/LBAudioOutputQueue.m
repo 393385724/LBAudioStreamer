@@ -136,10 +136,10 @@ static void LBAudioQueueIsRunningCallback(void *inUserData,
                packetCount:(UInt32)packetCount
         packetDescriptions:(AudioStreamPacketDescription *)packetDescriptions
                      isEOF:(BOOL)isEOF{
-    if ([data length] > audioBufferSize) {
-        NSLog(@"data > audioBufferSize");
-        return NO;
-    }
+//    if ([data length] > audioBufferSize) {
+//        NSLog(@"data > audioBufferSize");
+//        return NO;
+//    }
     self.isEOF = isEOF;
     
     //标记当前使用的buffer

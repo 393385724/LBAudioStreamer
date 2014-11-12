@@ -9,9 +9,9 @@
 #ifndef LBAudioPlayer_LBAudioDefine_h
 #define LBAudioPlayer_LBAudioDefine_h
 
-const int kAQdefaultBufferSize = 1024;
+const int kAQdefaultBufferSize = 2048;
 
-const int kNumAQBufs = 32;  //>=3 太小容易卡顿，太大耗内存
+const int kNumAQBufs = 16;  //>=3 太小容易卡顿，太大耗内存
 
 
 //音频播放 错误码
