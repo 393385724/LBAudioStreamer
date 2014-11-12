@@ -29,6 +29,9 @@
 		908F69721A0A45A1008EFC1D /* LBRemoteMusicViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 908F696B1A0A45A1008EFC1D /* LBRemoteMusicViewController.m */; };
 		908F69731A0A45A1008EFC1D /* LBRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 908F696D1A0A45A1008EFC1D /* LBRootViewController.m */; };
 		908F69741A0A45A1008EFC1D /* LBViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 908F696F1A0A45A1008EFC1D /* LBViewController.m */; };
+		90D19D421A13129E00B0B369 /* AudioTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 90D19D411A13129E00B0B369 /* AudioTest.m */; };
+		90D19D461A13304B00B0B369 /* origin.caf in Resources */ = {isa = PBXBuildFile; fileRef = 90D19D431A13304B00B0B369 /* origin.caf */; };
+		90D19D471A13304C00B0B369 /* pre.caf in Resources */ = {isa = PBXBuildFile; fileRef = 90D19D441A13304B00B0B369 /* pre.caf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,6 +90,10 @@
 		908F696D1A0A45A1008EFC1D /* LBRootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LBRootViewController.m; sourceTree = "<group>"; };
 		908F696E1A0A45A1008EFC1D /* LBViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LBViewController.h; sourceTree = "<group>"; };
 		908F696F1A0A45A1008EFC1D /* LBViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LBViewController.m; sourceTree = "<group>"; };
+		90D19D401A13129E00B0B369 /* AudioTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioTest.h; sourceTree = "<group>"; };
+		90D19D411A13129E00B0B369 /* AudioTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioTest.m; sourceTree = "<group>"; };
+		90D19D431A13304B00B0B369 /* origin.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = origin.caf; sourceTree = "<group>"; };
+		90D19D441A13304B00B0B369 /* pre.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = pre.caf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,6 +197,7 @@
 		908F69251A09FB1E008EFC1D /* LBAudioPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				90D19D3F1A13116400B0B369 /* AudioFilter */,
 				9071C60A1A12321B00DDF95E /* DDProgectDefinition.h */,
 				906C47581A10A95D00C07050 /* AudioPlayer */,
 				908F692A1A09FB1E008EFC1D /* AppDelegate.h */,
@@ -236,6 +244,17 @@
 				908F69411A09FB1E008EFC1D /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		90D19D3F1A13116400B0B369 /* AudioFilter */ = {
+			isa = PBXGroup;
+			children = (
+				90D19D431A13304B00B0B369 /* origin.caf */,
+				90D19D441A13304B00B0B369 /* pre.caf */,
+				90D19D401A13129E00B0B369 /* AudioTest.h */,
+				90D19D411A13129E00B0B369 /* AudioTest.m */,
+			);
+			path = AudioFilter;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -320,6 +339,8 @@
 			files = (
 				908F69321A09FB1E008EFC1D /* Main.storyboard in Resources */,
 				908F69371A09FB1E008EFC1D /* LaunchScreen.xib in Resources */,
+				90D19D461A13304B00B0B369 /* origin.caf in Resources */,
+				90D19D471A13304C00B0B369 /* pre.caf in Resources */,
 				908F69341A09FB1E008EFC1D /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -339,6 +360,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				906C47711A10A95D00C07050 /* LBAudioFile.m in Sources */,
+				90D19D421A13129E00B0B369 /* AudioTest.m in Sources */,
 				906C47771A10A95D00C07050 /* LBAudioOutputQueue.m in Sources */,
 				906C47731A10A95D00C07050 /* LBAudioStreamCache.m in Sources */,
 				906C477E1A10E80400C07050 /* NSString+AudioPlayer.m in Sources */,
