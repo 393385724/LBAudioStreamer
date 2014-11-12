@@ -29,6 +29,8 @@
 
 @property (nonatomic, assign) BOOL hasOpen;
 
+@property (nonatomic, assign) BOOL hasCached;
+
 @end
 
 @implementation LBAudioStreamCache
@@ -56,8 +58,11 @@
 #pragma mark   Accessor
 
 -(unsigned long long)contentLength{
-    unsigned long long length = [self.metaCache.contentLength unsignedIntegerValue];
-    return length;
+    if (self.hasCached) {
+        return  _contentLength;
+    } else {
+        return [self.metaCache.contentLength unsignedIntegerValue];
+    }
 }
 
 #pragma mark -
@@ -69,21 +74,60 @@
     [self.readerFileHandle closeFile];
 }
 
+- (instancetype)initWithFilePath:(NSString *)filePath{
+    return [self initWithURL:nil cachePath:filePath hasCached:YES];
+}
+
 - (instancetype)initWithURL:(NSURL *)url cachePath:(NSString *)filePath{
+    return [self initWithURL:url cachePath:filePath hasCached:NO];
+}
+
+- (instancetype)initWithURL:(NSURL *)url cachePath:(NSString *)filePath hasCached:(BOOL)cached{
     self =[super init];
     if (self) {
+        self.hasCached = cached;
         self.url= url;
         self.filePath = filePath;
         self.bytesOffset = 0;
         self.metaCachePath = [self.filePath stringByAppendingString:@".meta"];
         self.metaCache = [[LBAudioStreamMetaCache alloc] initWithMetaCachePath:self.metaCachePath];
         self.readerFileHandle = [NSFileHandle fileHandleForReadingAtPath:self.filePath];
+        if (cached) {
+            self.contentLength = [[[NSFileManager defaultManager] attributesOfItemAtPath:self.filePath error:nil] fileSize];
+        }
         [self createFile];
     }
     return self;
 }
 
 - (NSData *)readDataOfLength:(NSUInteger)length isEOF:(BOOL *)isEOF error:(NSError **)error{
+    NSData *data = nil;
+    if (self.hasCached) {
+        data = [self readLocaDataOfLength:length isEOF:isEOF error:error];
+    } else {
+        data = [self readNetDataOfLength:length isEOF:isEOF error:error];
+    }
+    self.bytesOffset += [data length];
+    return data;
+}
+
+- (void)seekToFileOffset:(unsigned long long)offset{
+    if (self.hasCached) {
+        [self.readerFileHandle seekToFileOffset:offset];
+    }
+    self.bytesOffset = offset;
+}
+
+- (NSData *)readLocaDataOfLength:(NSUInteger)length isEOF:(BOOL *)isEOF error:(NSError **)error{
+    NSLog(@"%llu,%llu",self.bytesOffset, self.contentLength);
+    if (self.bytesOffset >= self.contentLength) {
+        *isEOF = YES;
+        return nil;
+    }
+    return [self.readerFileHandle readDataOfLength:length];
+}
+
+- (NSData *)readNetDataOfLength:(NSUInteger)length isEOF:(BOOL *)isEOF error:(NSError **)error{
     __block NSData *data = nil;
     for (NSArray *aRange in self.metaCache.rangeArray) {
         unsigned long long startOffset = [aRange[0] unsignedLongLongValue];
@@ -120,15 +164,8 @@
     } else {
         self.netRequest = nil;
     }
-    self.bytesOffset += [data length];
-
     return data;
 }
-
-- (void)seekToFileOffset:(unsigned long long)offset{
-    self.bytesOffset = offset;
-}
-
 #pragma mark -
 #pragma mark  pravite Method
 

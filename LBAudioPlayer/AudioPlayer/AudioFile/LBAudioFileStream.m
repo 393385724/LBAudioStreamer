@@ -8,7 +8,6 @@
 
 #import "LBAudioFileStream.h"
 #import "LBParsedAudioData.h"
-#import "LBAudioStreamCache.h"
 
 #define BitRateEstimationMaxPackets 5000
 #define BitRateEstimationMinPackets 50
@@ -19,9 +18,6 @@
     
 }
 
-@property (nonatomic, strong) LBAudioStreamCache *streamCache;
-
-@property (nonatomic, assign) unsigned long long fileSize;
 @property (nonatomic, assign) NSTimeInterval duration;
 @property (nonatomic, assign) UInt32 bitRate;
 @property (nonatomic, assign) SInt64 dataOffset;
@@ -84,12 +80,9 @@ void audioFileStream_PacketsProc(void *							inClientData,
 }
 
 - (instancetype)initWithFileType:(AudioFileTypeID)fileType
-                        audioURL:(NSURL *)url
-                       cachePath:(NSString *)filePath
                            error:(NSError **)error{
     self = [super init];
     if (self) {
-        self.streamCache = [[LBAudioStreamCache alloc] initWithURL:url cachePath:filePath];
         [self openAudioFileStreamWithFileTypeHint:fileType
                                             error:error];
     }
@@ -100,18 +93,20 @@ void audioFileStream_PacketsProc(void *							inClientData,
 #pragma mark   Public Mehtods
 
 /*音频文件数据解析*/
-- (void)parseDataWithLength:(NSInteger)length isEOF:(BOOL *)isEof error:(NSError **)error{
-    NSData *data = [self.streamCache readDataOfLength:length isEOF:isEof error:error];
-    if (self.fileSize == 0) {
-        self.fileSize = self.streamCache.contentLength;
+- (BOOL)parseData:(NSData *)data error:(NSError **)error{
+    if (self.readyToProducePackets && self.packetDuration == 0){
+        return NO;
     }
     OSStatus status = AudioFileStreamParseBytes(_audioFileStreamID,
                                                 (UInt32)[data length],
                                                 [data bytes],
                                                 self.discontinuous ? kAudioFileStreamParseFlag_Discontinuity : 0);
+    
     if (status != noErr) {
         NSLog(@"AudioFileStreamParseBytes 失败");
+        return NO;
     }
+    return YES;
 }
 
 - (NSData *)fetchMagicCookie{
@@ -144,10 +139,7 @@ void audioFileStream_PacketsProc(void *							inClientData,
 }
 
 
-- (void)seekToTime:(NSTimeInterval *)time{
-    if (self.bitRate == 0 && self.audioDataByteCount == 0) {
-        return;
-    }
+- (SInt64)seekToTime:(NSTimeInterval *)time{
     self.discontinuous = YES;
     SInt64 seekByteOffset = self.dataOffset + (*time / self.duration) * self.audioDataByteCount;
     SInt64 seekToPacket = floor(*time / self.packetDuration);
@@ -162,8 +154,7 @@ void audioFileStream_PacketsProc(void *							inClientData,
         *time -= ((seekByteOffset - self.dataOffset) - outDataByteOffset) * 8.0 / self.bitRate;
         seekByteOffset = outDataByteOffset + self.dataOffset;
     }
-
-    [self.streamCache seekToFileOffset:seekByteOffset];
+    return seekByteOffset;
 }
 
 

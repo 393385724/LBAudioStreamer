@@ -136,16 +136,12 @@ static void LBAudioQueueIsRunningCallback(void *inUserData,
                packetCount:(UInt32)packetCount
         packetDescriptions:(AudioStreamPacketDescription *)packetDescriptions
                      isEOF:(BOOL)isEOF{
-//    if ([data length] > audioBufferSize) {
-//        NSLog(@"data > audioBufferSize");
-//        return NO;
-//    }
     self.isEOF = isEOF;
     
     //标记当前使用的buffer
     inUseBuffer[self.currentFillBufferIndex] = true;
     self.bufferUsed ++;
-    NSLog(@"playWithParsedData: %ld",(long)self.bufferUsed);
+//    NSLog(@"playWithParsedData: %ld",(long)self.bufferUsed);
 
     //给当前使用的buffer填充数据
     AudioQueueBufferRef buffer = audioQueueBuffer[self.currentFillBufferIndex];
@@ -332,7 +328,7 @@ static void LBAudioQueueIsRunningCallback(void *inUserData,
     } else {
         inUseBuffer[completeIndex] = false;
         self.bufferUsed--;
-        NSLog(@"handleBufferCompleteForQueue: %ld",(long)self.bufferUsed);
+//        NSLog(@"handleBufferCompleteForQueue: %ld",(long)self.bufferUsed);
         if (self.bufferUsed == 0 && !self.isEOF) {
             if (self.audioQueueBlock) {
                 self.audioQueueBlock(YES);

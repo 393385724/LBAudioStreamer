@@ -21,6 +21,7 @@ typedef void (^LBAudioFileStreamBlock) (LBAudioFileStream *fileStream, NSArray *
 
 @property (nonatomic,readonly) BOOL readyToProducePackets;
 
+@property (nonatomic, assign) unsigned long long fileSize;
 @property (nonatomic,readonly) AudioStreamBasicDescription format;
 @property (nonatomic,readonly) NSTimeInterval duration;
 @property (nonatomic,readonly) UInt32 bitRate;
@@ -28,15 +29,13 @@ typedef void (^LBAudioFileStreamBlock) (LBAudioFileStream *fileStream, NSArray *
 @property (nonatomic,readonly) SInt64 dataOffset;
 
 - (instancetype)initWithFileType:(AudioFileTypeID)fileType
-                        audioURL:(NSURL *)url
-                       cachePath:(NSString *)filePath
                            error:(NSError **)error;
 
-- (void)parseDataWithLength:(NSInteger)length isEOF:(BOOL *)isEof error:(NSError **)error;
+- (BOOL)parseData:(NSData *)data error:(NSError **)error;
 
 - (NSData *)fetchMagicCookie;
 
-- (void)seekToTime:(NSTimeInterval *)time;
+- (SInt64)seekToTime:(NSTimeInterval *)time;
 
 - (void)close;
 

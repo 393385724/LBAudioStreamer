@@ -13,6 +13,7 @@
 #import "LBAudioFileStream.h"
 #import "LBAudioOutputQueue.h"
 #import "LBAudioBufferPool.h"
+#import "LBAudioStreamCache.h"
 
 #import "NSString+AudioPlayer.h"
 #import "LBAudioDefine.h"
@@ -27,11 +28,13 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
 @property (nonatomic, strong) NSThread             *playThread;
 @property (nonatomic, strong) LBAudioFile          *audioFile;
 @property (nonatomic, strong) LBAudioFileStream    *audioFileStream;
+@property (nonatomic, strong) LBAudioStreamCache   *streamCache;
 @property (nonatomic, strong) LBAudioOutputQueue   *audioOutputQueue;
 @property (nonatomic, strong) LBAudioBufferPool    *audioBufferPool;
 @property (nonatomic, assign) LBAudioStreamerState state;
 
 @property (nonatomic, assign) BOOL localMusic;
+@property (nonatomic, assign) BOOL useAudioStream;
 
 /**控制变量*/
 @property (nonatomic, assign) BOOL started;
@@ -46,7 +49,6 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
 
 /**音频资源*/
 @property (nonatomic, copy) NSString *filePath;
-@property (nonatomic, copy) NSString *cachePath;
 @property (nonatomic, strong) NSURL *audioURL;
 
 @end
@@ -88,9 +90,8 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
     self = [self init];
     if (self) {
         NSAssert(aUrl, @"URL 不能为空");
-        self.cachePath = cachePath ? cachePath : [NSString papaAudioCachePath:self.audioURL hasType:NO];
+        self.filePath = cachePath ? cachePath : [NSString papaAudioCachePath:self.audioURL hasType:NO];
         self.audioURL = aUrl;
-        self.localMusic = NO;
     }
     return self;
 }
@@ -100,7 +101,7 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
     if (self) {
         NSAssert(aUrl, @"URL 不能为空");
         self.audioURL = aUrl;
-        self.cachePath = [NSString papaAudioCachePath:self.audioURL hasType:YES];
+        self.filePath = [NSString papaAudioCachePath:self.audioURL hasType:YES];
         self.localMusic = YES;
     }
     return self;
@@ -110,8 +111,8 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
     self = [self init];
     if (self) {
         NSAssert(filePath, @"filePath 不能为空");
+        self.useAudioStream = YES;
         self.filePath = filePath;
-        self.localMusic = YES;
     }
     return self;
 }
@@ -229,60 +230,88 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
     return NO;
 }
 
+- (void)createAudioFileWithError:(NSError **)error{
+    __weak LBAudioPlayer *weakSelf = self;
+    if (!self.audioFile) {
+        if (self.audioURL) {
+            self.audioFile = [[LBAudioFile alloc] initWithAsset:self.audioURL cachePath:self.filePath error:error];
+        } else {
+            self.audioFile = [[LBAudioFile alloc] initWithFilePath:self.filePath fileType:[self hintForFileExtension:self.filePath.pathExtension] error:error];
+        }
+        if (error) {
+            self.audioFile = nil;
+        } else {
+            self.audioFile.audioFileParsedBlock =  ^(LBAudioFile *audioFile, NSArray *audioDataArray){
+                [weakSelf.audioBufferPool enqueueFromDataArray:audioDataArray];
+            };
+        }
+    }
+}
+
+- (void)createAudioStreamWithError:(NSError **)error{
+    error = nil;
+    __weak LBAudioPlayer *weakSelf = self;
+    if (!self.audioFileStream) {
+        self.audioFileStream = [[LBAudioFileStream alloc] initWithFileType:kAudioFileMP3Type error:error];
+        if (self.useAudioStream) {
+            self.streamCache = [[LBAudioStreamCache alloc] initWithFilePath:self.filePath];
+            self.audioFileStream.fileSize = self.streamCache.contentLength;
+        } else {
+            self.streamCache = [[LBAudioStreamCache alloc] initWithURL:self.audioURL cachePath:self.filePath];
+        }
+        if (error) {
+            self.audioFileStream = nil;
+            self.streamCache = nil;
+        } else {
+            self.audioFileStream.audioFileParsedBlock =  ^(LBAudioFileStream *audioFileStream, NSArray *audioDataArray){
+                [weakSelf.audioBufferPool enqueueFromDataArray:audioDataArray];
+            };
+        }
+    }
+}
+
 /** 线程主函数入口 */
 - (void)threadPlayMain{
     @autoreleasepool {
-        NSError *error;
-        __weak LBAudioPlayer *weakSelf = self;
-        
+        NSError *error = nil;
         //等待数据
         [self updateAudioState:LBAudioStreamerStateWaitting];
         
-        //创建解析器
-        if (self.localMusic) {
-            if (!self.audioFile) {
-                if (self.audioURL) {
-                    self.audioFile = [[LBAudioFile alloc] initWithAsset:self.audioURL cachePath:self.cachePath error:&error];
-                } else {
-                    self.audioFile = [[LBAudioFile alloc] initWithFilePath:self.filePath fileType:[self hintForFileExtension:self.filePath.pathExtension] error:&error];
-                }
-                if (error) {
-                    self.audioFile = nil;
-                } else {
-                    self.audioFile.audioFileParsedBlock =  ^(LBAudioFile *audioFile, NSArray *audioDataArray){
-                        [weakSelf.audioBufferPool enqueueFromDataArray:audioDataArray];
-                    };
-                }
-            }
-        } else {
-            if (!self.audioFileStream) {
-                self.audioFileStream = [[LBAudioFileStream alloc] initWithFileType:kAudioFileMP3Type audioURL:self.audioURL cachePath:self.cachePath error:&error];
-                if (error) {
-                    self.audioFileStream = nil;
-                } else {
-                    self.audioFileStream.audioFileParsedBlock =  ^(LBAudioFileStream *audioFileStream, NSArray *audioDataArray){
-                        [weakSelf.audioBufferPool enqueueFromDataArray:audioDataArray];
-                    };
-                }
-            }
-        }
-        
-        if (error) {
-            [self updateAudioState:LBAudioStreamerStateError];
-        }
-
         //播放控制
         BOOL isEOF = NO;
         
         while (![self shouldStopped] && self.started) {
             @autoreleasepool {
                 /*如果AudioFileStream已经readyToProducePackets 或者 缓存池中的数据小于最大缓存数据，则读取原始数据并且解析组装*/
-                if ( self.audioBufferPool.bufferPoolSize < kAQdefaultBufferSize) {
+                if ( self.audioBufferPool.bufferPoolSize <= kAQdefaultBufferSize && !isEOF) {
                     if (self.localMusic) {
+                        
+                        [self createAudioFileWithError:&error];
+                        if (error) {
+                            [self updateAudioState:LBAudioStreamerStateError];
+                            break;
+                        }
                         [self.audioFile parseData:&isEOF error:&error];
+                        
                     } else {
-                        [self.audioFileStream parseDataWithLength:kAQdefaultBufferSize isEOF:&isEOF error:&error];
+                        [self createAudioStreamWithError:&error];
+                        if (error) {
+                            [self updateAudioState:LBAudioStreamerStateError];
+                            break;
+                        }
+                        NSData *data = [self.streamCache readDataOfLength:kAQdefaultBufferSize isEOF:&isEOF error:&error];
+                        if (self.audioFileStream.fileSize == 0) {
+                            self.audioFileStream.fileSize = self.streamCache.contentLength;
+                        }
+                        [self.audioFileStream parseData:data error:&error];
+                        
+                        if (error && self.useAudioStream) {
+                            error = nil;
+                            self.localMusic = YES;
+                            continue;
+                        }
                     }
+                    
                     if (error) {
                         [self updateAudioState:LBAudioStreamerStateError];
                         break;
@@ -298,10 +327,6 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
                         break;
                     }
                     
-                    if (self.state == LBAudioStreamerStateFlushing && !self.audioOutputQueue.isRunning) {
-                        break;
-                    }
-                    
                     if (self.seekRequired) {
                         self.seekRequired = NO;
                         [self updateAudioState:LBAudioStreamerStateWaitting];
@@ -310,7 +335,8 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
                         if (self.localMusic) {
                             [self.audioFile seekToTime:self.seekTime];
                         } else {
-                            [self.audioFileStream seekToTime:&_seekTime];
+                           SInt64 offset = [self.audioFileStream seekToTime:&_seekTime];
+                            [self.streamCache seekToFileOffset:offset];
                         }
                         self.seekRequired = NO;
                         [self.audioOutputQueue reset];
@@ -355,6 +381,7 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
                             if ([self.audioBufferPool isEmpty] && isEOF){
                                 [self.audioOutputQueue stop:NO];
                                 [self updateAudioState:LBAudioStreamerStateFlushing];
+                                break;
                             }
                         } else if (isEOF){
                         } else {
@@ -366,6 +393,10 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
             }
         }
         
+        while (self.audioOutputQueue.isRunning && self.state == LBAudioStreamerStateFlushing) {
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+        }
+
         //重置
         [self cleanUp];
     }
@@ -380,6 +411,7 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
     self.audioFile = nil;
     [self.audioFileStream close];
     self.audioFileStream = nil;
+    self.streamCache = nil;
     
     //关闭播放器
     [self.audioOutputQueue stop:YES];
