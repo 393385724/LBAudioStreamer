@@ -10,6 +10,7 @@
 #import <pthread.h>
 #import <AVFoundation/AVFoundation.h>
 #import "LBParsedAudioData.h"
+#import "LBAudioDefine.h"
 
 static const UInt32 packetPerRead = 3;
 
@@ -128,11 +129,11 @@ static SInt64 audioFileGetSizeProc(void *inClientData){
                     [weakSelf initSettings];
                     [weakSelf mutexSignal];
                     [weakSelf mutexDestory];
-                    NSLog(@"导出成功");
+                    LBLog(@"导出成功");
                 }
                     break;
                 default:{
-                    NSLog(@"导出失败:%@",assetExportSession.error);
+                    LBLog(@"导出失败:%@",assetExportSession.error);
                     *error = [NSError errorWithDomain:@"导出失败" code:100 userInfo:nil];
                     [weakSelf mutexSignal];
                     [weakSelf mutexDestory];
@@ -179,10 +180,11 @@ static SInt64 audioFileGetSizeProc(void *inClientData){
                                               &ioNumPackets,
                                               outBuffer);
     if (status != noErr){
+        LBLog(@"%@",OSStatusCode(status));
         if (status == kAudioFileEndOfFileError) {
             *isEof = YES;
         } else {
-            *error = [NSError errorWithDomain:@"sdsdsdsd" code:100 userInfo:nil];
+            *error = [NSError errorWithDomain:@"AudioFileReadPacketData Error" code:100 userInfo:nil];
         }
     }
     
@@ -250,7 +252,7 @@ static SInt64 audioFileGetSizeProc(void *inClientData){
                                                  &_audioFileID);
     if (status != noErr){
         self.audioFileID = NULL;
-        NSLog(@"AudioFileOpenWithCallbacks,失败");
+        LBLog(@"AudioFileOpenWithCallbacks失败:%@",OSStatusCode(status));
         return NO;
     }
     return YES;
@@ -281,7 +283,7 @@ static SInt64 audioFileGetSizeProc(void *inClientData){
             status = AudioFormatGetPropertyInfo(kAudioFormatProperty_DecodeFormatIDs, 0, NULL, &supportedFormatsSize);
             if (status != noErr){
                 free(formatList);
-                NSLog(@"AudioFormatGetPropertyInfo 失败");
+                LBLog(@"AudioFormatGetPropertyInfo 失败:%@",OSStatusCode(status));
                 [self closeAudioFile];
                 return;
             }
@@ -292,7 +294,7 @@ static SInt64 audioFileGetSizeProc(void *inClientData){
             if (status != noErr){
                 free(formatList);
                 free(supportedFormats);
-                NSLog(@"AudioFormatGetProperty 失败");
+                LBLog(@"AudioFormatGetProperty 失败:%@",OSStatusCode(status));
                 [self closeAudioFile];
                 return;
             }
@@ -312,7 +314,7 @@ static SInt64 audioFileGetSizeProc(void *inClientData){
         free(formatList);
         
         if (!found){
-            NSLog(@"获取 format 失败");
+            LBLog(@"获取 format 失败");
             [self closeAudioFile];
             return;
         } else {
@@ -324,7 +326,7 @@ static SInt64 audioFileGetSizeProc(void *inClientData){
     UInt32 size = sizeof(bitRate);
     status = AudioFileGetProperty(_audioFileID, kAudioFilePropertyBitRate, &size, &bitRate);
     if (status != noErr){
-        NSLog(@"比特率 失败");
+        LBLog(@"比特率 失败");
         [self closeAudioFile];
         return;
     }
@@ -334,7 +336,7 @@ static SInt64 audioFileGetSizeProc(void *inClientData){
     size = sizeof(dataOffset);
     status = AudioFileGetProperty(_audioFileID, kAudioFilePropertyDataOffset, &size, &dataOffset);
     if (status != noErr){
-        NSLog(@"偏移 失败");
+        LBLog(@"偏移 失败");
         [self closeAudioFile];
         return;
     }
@@ -356,7 +358,7 @@ static SInt64 audioFileGetSizeProc(void *inClientData){
     if (status != noErr || maxPacketSize == 0){
         status = AudioFileGetProperty(_audioFileID, kAudioFilePropertyMaximumPacketSize, &size, &maxPacketSize);
         if (status != noErr){
-            NSLog(@"包的最大值 失败");
+            LBLog(@"包的最大值 失败");
             [self closeAudioFile];
             return;
         }

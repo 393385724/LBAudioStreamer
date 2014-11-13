@@ -9,6 +9,7 @@
 #include <pthread.h>
 #include <sys/time.h>
 #import "LBAudioStreamNetRequest.h"
+#import "LBAudioDefine.h"
 
 #define NETWORK_TIMEOUT (60)
 
@@ -91,7 +92,7 @@ static void ReadStreamCallBack(
                                                          kCFStreamPropertyHTTPShouldAutoredirect,
                                                          kCFBooleanTrue);
     if (!shouldAutoredirect){
-        NSLog(@"Read stream Set property failed ---- kCFStreamPropertyHTTPShouldAutoredirect");
+        LBLog(@"Read stream Set property failed ---- kCFStreamPropertyHTTPShouldAutoredirect");
         return NO;
     }
     
@@ -102,7 +103,7 @@ static void ReadStreamCallBack(
     CFRelease(proxySettings);
     
     if (!canHTTPProxy){
-        NSLog(@"Read stream Set property failed ---- kCFStreamPropertyHTTPProxy");
+        LBLog(@"Read stream Set property failed ---- kCFStreamPropertyHTTPProxy");
         return NO;
     }
     
@@ -132,7 +133,7 @@ static void ReadStreamCallBack(
     // 开始读
     if (!CFReadStreamOpen(readStream)){
         CFRelease(readStream);
-        NSLog(@"Read stream Open failed.");
+        LBLog(@"Read stream Open failed.");
         return NO;
     }
     
@@ -143,7 +144,7 @@ static void ReadStreamCallBack(
                                                   ReadStreamCallBack,
                                                   &context);
     if (!canSetClient) {
-        NSLog(@"Read stream SetClient failed.");
+        LBLog(@"Read stream SetClient failed.");
         return NO;
     }
     CFReadStreamScheduleWithRunLoop(readStream,
@@ -189,7 +190,7 @@ static void ReadStreamCallBack(
     if (len == -1) {
         pthread_mutex_unlock(&pthreadMutex);
         free(buffer);
-        *error = [NSError errorWithDomain:@"sdsdsds" code:100 userInfo:nil];
+        *error = [NSError errorWithDomain:@"流媒体数据读取失败" code:100 userInfo:nil];
         return nil;
     }
     

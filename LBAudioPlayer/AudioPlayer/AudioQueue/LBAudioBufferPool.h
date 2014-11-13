@@ -6,7 +6,7 @@
 //  Copyright (c) 2014年 lilingang. All rights reserved.
 //
 
-/*用来存储解析出来的PCM数据*/
+/*用来存储解析出来的PCM数据(N帧)*/
 
 #import <Foundation/Foundation.h>
 #import <CoreAudio/CoreAudioTypes.h>

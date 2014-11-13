@@ -8,7 +8,7 @@
 
 #import "LBAudioFileStream.h"
 #import "LBParsedAudioData.h"
-#import "LBAudioStreamCache.h"
+#import "LBAudioDefine.h"
 
 #define BitRateEstimationMaxPackets 5000
 #define BitRateEstimationMinPackets 50
@@ -19,9 +19,6 @@
     
 }
 
-@property (nonatomic, strong) LBAudioStreamCache *streamCache;
-
-@property (nonatomic, assign) unsigned long long fileSize;
 @property (nonatomic, assign) NSTimeInterval duration;
 @property (nonatomic, assign) UInt32 bitRate;
 @property (nonatomic, assign) SInt64 dataOffset;
@@ -84,12 +81,9 @@ void audioFileStream_PacketsProc(void *							inClientData,
 }
 
 - (instancetype)initWithFileType:(AudioFileTypeID)fileType
-                        audioURL:(NSURL *)url
-                       cachePath:(NSString *)filePath
                            error:(NSError **)error{
     self = [super init];
     if (self) {
-        self.streamCache = [[LBAudioStreamCache alloc] initWithURL:url cachePath:filePath];
         [self openAudioFileStreamWithFileTypeHint:fileType
                                             error:error];
     }
@@ -100,18 +94,20 @@ void audioFileStream_PacketsProc(void *							inClientData,
 #pragma mark   Public Mehtods
 
 /*音频文件数据解析*/
-- (void)parseDataWithLength:(NSInteger)length isEOF:(BOOL *)isEof error:(NSError **)error{
-    NSData *data = [self.streamCache readDataOfLength:length isEOF:isEof error:error];
-    if (self.fileSize == 0) {
-        self.fileSize = self.streamCache.contentLength;
+- (BOOL)parseData:(NSData *)data error:(NSError **)error{
+    if (self.readyToProducePackets && self.packetDuration == 0){
+        return NO;
     }
     OSStatus status = AudioFileStreamParseBytes(_audioFileStreamID,
                                                 (UInt32)[data length],
                                                 [data bytes],
                                                 self.discontinuous ? kAudioFileStreamParseFlag_Discontinuity : 0);
+    
     if (status != noErr) {
-        NSLog(@"AudioFileStreamParseBytes 失败");
+        LBLog(@"AudioFileStreamParseBytes 失败:%@",OSStatusCode(status));
+        return NO;
     }
+    return YES;
 }
 
 - (NSData *)fetchMagicCookie{
@@ -144,13 +140,10 @@ void audioFileStream_PacketsProc(void *							inClientData,
 }
 
 
-- (void)seekToTime:(NSTimeInterval *)time{
-    if (self.bitRate == 0 && self.audioDataByteCount == 0) {
-        return;
-    }
+- (SInt64)seekToTime:(NSTimeInterval)time{
     self.discontinuous = YES;
-    SInt64 seekByteOffset = self.dataOffset + (*time / self.duration) * self.audioDataByteCount;
-    SInt64 seekToPacket = floor(*time / self.packetDuration);
+    SInt64 seekByteOffset = self.dataOffset + (time / self.duration) * self.audioDataByteCount;
+    SInt64 seekToPacket = floor(time / self.packetDuration);
     SInt64 outDataByteOffset;
     UInt32 ioFlags = 0;
     OSStatus status = AudioFileStreamSeek(_audioFileStreamID,
@@ -159,11 +152,10 @@ void audioFileStream_PacketsProc(void *							inClientData,
                                           &ioFlags);
     
     if (status == noErr && !(ioFlags & kAudioFileStreamSeekFlag_OffsetIsEstimated)){
-        *time -= ((seekByteOffset - self.dataOffset) - outDataByteOffset) * 8.0 / self.bitRate;
+//        *time -= ((seekByteOffset - self.dataOffset) - outDataByteOffset) * 8.0 / self.bitRate;
         seekByteOffset = outDataByteOffset + self.dataOffset;
     }
-
-    [self.streamCache seekToFileOffset:seekByteOffset];
+    return seekByteOffset;
 }
 
 
@@ -186,6 +178,7 @@ void audioFileStream_PacketsProc(void *							inClientData,
     
     if (status != noErr){
         _audioFileStreamID = NULL;
+        LBLog(@"AudioFileStreamOpen: %@",OSStatusCode(status));
         return NO;
     }
     return status == noErr;
@@ -239,7 +232,7 @@ void audioFileStream_PacketsProc(void *							inClientData,
 - (void)handlePropertyListenerProForFileStream:(AudioFileStreamID)inAudioFileStream
                                     propertyID:(AudioFileStreamPropertyID)inPropertyID
                                        ioFlags:(UInt32 *)ioFlags{
-    NSLog(@"Property is %c%c%c%c",
+    LBLog(@"Property is %c%c%c%c",
             ((char *)&inPropertyID)[3],
             ((char *)&inPropertyID)[2],
             ((char *)&inPropertyID)[1],
@@ -302,7 +295,7 @@ void audioFileStream_PacketsProc(void *							inClientData,
                                 ((char *)&fileFormat)[2],
                                 ((char *)&fileFormat)[1],
                                 ((char *)&fileFormat)[0]];
-        NSLog(@"fileFormat: %@", fileFormatString);
+        LBLog(@"fileFormat: %@", fileFormatString);
         
     } else if (inPropertyID == kAudioFileStreamProperty_DataFormat){
         //音频文件结构信息，是一个AudioStreamBasicDescription的结构

@@ -12,13 +12,15 @@
 
 @property (nonatomic, assign) unsigned long long contentLength;
 
-+ (BOOL)isCacheCompletedForCacheDataPath:(NSString *)cacheDataPath;
-
 - (instancetype)initWithURL:(NSURL *)url cachePath:(NSString *)filePath;
+
+- (instancetype)initWithFilePath:(NSString *)filePath;
 
 - (NSData *)readDataOfLength:(NSUInteger)length isEOF:(BOOL *)isEOF error:(NSError **)error;
 
 - (void)seekToFileOffset:(unsigned long long)offset;
+
+- (void)closeNet;
 
 
 @end

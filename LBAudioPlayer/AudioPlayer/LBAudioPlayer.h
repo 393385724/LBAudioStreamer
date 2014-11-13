@@ -16,7 +16,7 @@ typedef NS_ENUM(NSUInteger, LBAudioStreamerState) {
     LBAudioStreamerStateWaitting,   //正在等待
     LBAudioStreamerStatePlay,       //正在播放
     LBAudioStreamerStatePause,      //暂停
-    LBAudioStreamerStateFlushing,   //最后数据播放完
+    LBAudioStreamerStateFlushing,   //等待最后数据播放完
     LBAudioStreamerStateStop,       //停止
     LBAudioStreamerStateError,      //出错了
 };
@@ -29,8 +29,8 @@ typedef NS_ENUM(NSUInteger, LBAudioStreamerState) {
 
 @property (nonatomic) float volume; /* The volume for the sound.from 0.0 to 1.0. */
 
-@property (readonly) NSTimeInterval duration;
-@property (readonly) NSTimeInterval currentTime;  //当前播放的时间,未播放为0
+@property (nonatomic, assign) NSTimeInterval duration;
+@property (readonly) NSTimeInterval currentTime;  //当前播放的时间,未播放为0,为什么老是差1s
 @property (readonly) LBAudioStreamerState state;
 
 /**Play Net Music*/
