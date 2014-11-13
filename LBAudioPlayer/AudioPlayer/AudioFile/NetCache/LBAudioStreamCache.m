@@ -147,6 +147,7 @@
             }
             [self.readerFileHandle seekToFileOffset:self.bytesOffset];
             data = [self.readerFileHandle readDataOfLength:MIN(length, (NSUInteger)(endOffset - self.bytesOffset))];
+            data = [self decryptData:data];
             break;
         }
     }
@@ -204,8 +205,38 @@
     if (!self.writerFileHandle) {
         self.writerFileHandle = [NSFileHandle fileHandleForUpdatingAtPath:self.filePath];
     }
+    NSRange cutRange = [self.metaCache updateRangeWithLocation:fromOffset length:cacheData.length];
+    
+    if (cutRange.length > 0 && cutRange.length < [cacheData length] ) {
+        //去重
+        UInt8 *buffer = (UInt8 *)malloc(cutRange.length);
+        [cacheData getBytes:buffer range:cutRange];
+        cacheData = [NSData dataWithBytes:buffer length:cutRange.length];
+    }
+    
+    cacheData = [self encryptData:cacheData];
     [self.writerFileHandle seekToFileOffset:fromOffset];
-    [self.metaCache updateRangeWithLocation:fromOffset length:cacheData.length];
     [self.writerFileHandle writeData:cacheData];
 }
+
+#pragma mark -
+#pragma mark   兼容啪啪  位移加密
+
+-(NSData *)encryptData:(NSData *)data{
+    if (data.length == 0) {
+        return data;
+    }
+    UInt8 *bytes = (UInt8 *)malloc(data.length);
+    for (int i=0; i<data.length; i++) {
+        bytes[i] = ((UInt8 *)data.bytes)[i] ^ LBDefaultAudioDataCacheFileEncryptorPassword;
+    }
+    NSData *result = [NSData dataWithBytes:bytes length:data.length];
+    free(bytes);
+    return result;
+}
+
+-(NSData *)decryptData:(NSData *)data{
+    return [self encryptData:data];
+}
+
 @end

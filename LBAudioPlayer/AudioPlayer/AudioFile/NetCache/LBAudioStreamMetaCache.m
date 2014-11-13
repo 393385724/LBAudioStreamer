@@ -32,26 +32,29 @@
 }
 
 
-- (NSUInteger)updateRangeWithLocation:(unsigned long long)location
+- (NSRange)updateRangeWithLocation:(unsigned long long)location
                                length:(NSUInteger)length{
     BOOL found = NO;
-    
-    NSUInteger dataLen = length;
-    
+    NSRange cutRange = NSMakeRange(0, 0);
     for (int i=0; i<self.rangeArray.count; i++) {
         @autoreleasepool {
             NSArray *range = self.rangeArray[i];
             NSUInteger rangeStart = [range[0] unsignedIntegerValue];
             NSUInteger rangeEnd = [range[1] unsignedIntegerValue];
             
-            if (rangeStart >= location + length) { //将要缓存的在当前range左边
-                range = @[@(location), @(rangeEnd)];
-                [self.rangeArray replaceObjectAtIndex:i withObject:range];
-                found = YES;
-            } else if (rangeEnd == location) { //将要缓存的在当前range右边
+            if (location == rangeEnd) { //将要缓存的在当前range右边
                 range = @[@(rangeStart), @(location + length)];
-                [self.rangeArray replaceObjectAtIndex:i withObject:range];
                 found = YES;
+            } else if (rangeStart == location + length) { //将要缓存的在当前range左边
+                range = @[@(location), @(rangeEnd)];
+                found = YES;
+            } else if (rangeStart < location + length && location < rangeStart){//将要缓存的在当前的rang左边需要去重
+                range = @[@(location), @(rangeEnd)];
+                cutRange.length = (NSUInteger)(rangeStart - location);
+                found = YES;
+            } 
+            if (found) {
+                [self.rangeArray replaceObjectAtIndex:i withObject:range];
             }
         }
     }
@@ -59,7 +62,7 @@
     if (!found) {
         [self.rangeArray addObject:@[@(location), @(location + length)]];
     }
-    return dataLen;
+    return cutRange;
 }
 
 

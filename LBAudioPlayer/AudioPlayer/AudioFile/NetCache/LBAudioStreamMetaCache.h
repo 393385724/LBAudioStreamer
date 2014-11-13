@@ -18,7 +18,7 @@
 
 - (instancetype) initWithMetaCachePath:(NSString *)metaCachePath;
 
-- (NSUInteger)updateRangeWithLocation:(unsigned long long)location
+- (NSRange)updateRangeWithLocation:(unsigned long long)location
                                length:(NSUInteger)length;
 
 - (void)updateMetaCache;
