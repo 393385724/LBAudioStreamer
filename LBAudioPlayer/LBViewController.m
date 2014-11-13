@@ -141,7 +141,7 @@
 
 
 - (void)audioPlayerStateChange:(NSNotification *)notification{
-    if ([notification.object integerValue] == LBAudioStreamerStatePlay || [notification.object integerValue] == LBAudioStreamerStateFlushing) {
+    if ([notification.object integerValue] == LBAudioStreamerStatePlay || [notification.object integerValue] == LBAudioStreamerStateFlushing ||[notification.object integerValue] == LBAudioStreamerStateWaitting ) {
         if (!self.timer.valid) {
             self.timer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(updateSlider) userInfo:nil repeats:YES]; 
         }

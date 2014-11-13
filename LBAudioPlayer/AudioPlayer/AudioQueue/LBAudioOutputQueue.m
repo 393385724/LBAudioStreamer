@@ -75,7 +75,7 @@ static void LBAudioQueueIsRunningCallback(void *inUserData,
                                              kAudioQueueParam_Volume,
                                              &volume);
     if (status != noErr) {
-        NSLog(@"getVolume Error");
+        LBLog(@"%@",OSStatusCode(status));
     }
     return volume;
 }
@@ -86,7 +86,7 @@ static void LBAudioQueueIsRunningCallback(void *inUserData,
                                               volume
                                               );
     if (status != noErr) {
-        NSLog(@"setVolume Error");
+        LBLog(@"%@",OSStatusCode(status));
     }
 }
 
@@ -141,7 +141,7 @@ static void LBAudioQueueIsRunningCallback(void *inUserData,
     //标记当前使用的buffer
     inUseBuffer[self.currentFillBufferIndex] = true;
     self.bufferUsed ++;
-//    NSLog(@"playWithParsedData: %ld",(long)self.bufferUsed);
+    LBLog(@"playWithParsedData: %ld",(long)self.bufferUsed);
 
     //给当前使用的buffer填充数据
     AudioQueueBufferRef buffer = audioQueueBuffer[self.currentFillBufferIndex];
@@ -234,7 +234,7 @@ static void LBAudioQueueIsRunningCallback(void *inUserData,
                                           0,
                                           &audioQueue);
     if (status != noErr) {
-        
+        LBLog(@"AudioQueueNewOutput:%@",OSStatusCode(status));
         return;
     }
     
@@ -244,7 +244,7 @@ static void LBAudioQueueIsRunningCallback(void *inUserData,
                                            LBAudioQueueIsRunningCallback,
                                            (__bridge void *)(self));
     if (status != noErr) {
-        
+        LBLog(@"AudioQueueAddPropertyListener:%@",OSStatusCode(status));
         return;
     }
     
@@ -254,7 +254,7 @@ static void LBAudioQueueIsRunningCallback(void *inUserData,
                                           audioBufferSize,
                                           &audioQueueBuffer[i]);
 		if (status != noErr){
-            
+            LBLog(@"AudioQueueAllocateBuffer:%@",OSStatusCode(status));
 			return;
 		}
 	}
@@ -267,7 +267,7 @@ static void LBAudioQueueIsRunningCallback(void *inUserData,
                                                     &val,
                                                     sizeof(UInt32));
     if (ignorableError != noErr){
-        
+        LBLog(@"AudioQueueSetProperty:%@",OSStatusCode(status));
         return;
     }
 #endif
@@ -324,11 +324,11 @@ static void LBAudioQueueIsRunningCallback(void *inUserData,
     }
     
     if (completeIndex == -1) {
-        NSLog(@"handleBufferCompleteForQueue  Not Found audioQueueBuffer");
+        LBLog(@"handleBufferCompleteForQueue  Not Found audioQueueBuffer");
     } else {
         inUseBuffer[completeIndex] = false;
         self.bufferUsed--;
-//        NSLog(@"handleBufferCompleteForQueue: %ld",(long)self.bufferUsed);
+        LBLog(@"handleBufferCompleteForQueue: %ld",(long)self.bufferUsed);
         if (self.bufferUsed == 0 && !self.isEOF) {
             if (self.audioQueueBlock) {
                 self.audioQueueBlock(YES);
@@ -348,7 +348,7 @@ static void LBAudioQueueIsRunningCallback(void *inUserData,
         UInt32 size = sizeof(UInt32);
         AudioQueueGetProperty(audioQueue, inID, &isRunning, &size);
         self.isRunning = isRunning;
-        NSLog(@"handleIsRunningPropertyChangeForQueue %d",(unsigned int)isRunning);
+        LBLog(@"handleIsRunningPropertyChangeForQueue %d",(unsigned int)isRunning);
     }
 }
 

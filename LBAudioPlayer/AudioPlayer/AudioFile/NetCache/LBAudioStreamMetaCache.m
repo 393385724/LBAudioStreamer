@@ -58,7 +58,6 @@
     
     if (!found) {
         [self.rangeArray addObject:@[@(location), @(location + length)]];
-        [self updateMetaCache];
     }
     return dataLen;
 }

@@ -6,7 +6,7 @@
 //  Copyright (c) 2014年 lilingang. All rights reserved.
 //
 
-/* 帧描述 */
+/* 解析出来的一个帧描述 */
 
 #import <Foundation/Foundation.h>
 #import <CoreAudio/CoreAudioTypes.h>

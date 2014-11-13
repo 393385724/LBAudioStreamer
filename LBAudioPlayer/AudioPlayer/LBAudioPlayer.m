@@ -67,6 +67,9 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
 }
 
 - (NSTimeInterval)duration{
+    if (_duration) {
+        return _duration;
+    }
     return self.localMusic ? self.audioFile.duration : self.audioFileStream.duration;
 }
 
@@ -144,6 +147,7 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
         
     } else if(([self isPaused] && !self.pauseRequired) || self.pausedByInterrupt){
         self.pausedByInterrupt = NO;
+        [self updateAudioState:LBAudioStreamerStatePlay];
         [self resume];
     }
 }
@@ -205,7 +209,7 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
 /** 更新当前播放状态 */
 - (void)updateAudioState:(LBAudioStreamerState)state{
     if (state == LBAudioStreamerStateError) {
-        NSLog(@"LBAudioStreamerStateError*********");
+        LBLog(@"LBAudioStreamerStateError*********");
     }
     if (self.state == state) {
         return;
@@ -231,6 +235,7 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
 }
 
 - (void)createAudioFileWithError:(NSError **)error{
+    error = nil;
     __weak LBAudioPlayer *weakSelf = self;
     if (!self.audioFile) {
         if (self.audioURL) {
@@ -288,6 +293,7 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
                         
                         [self createAudioFileWithError:&error];
                         if (error) {
+                            LBLog(@"createAudioFileWithError: %@",error);
                             [self updateAudioState:LBAudioStreamerStateError];
                             break;
                         }
@@ -295,10 +301,6 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
                         
                     } else {
                         [self createAudioStreamWithError:&error];
-                        if (error) {
-                            [self updateAudioState:LBAudioStreamerStateError];
-                            break;
-                        }
                         NSData *data = [self.streamCache readDataOfLength:kAQdefaultBufferSize isEOF:&isEOF error:&error];
                         if (self.audioFileStream.fileSize == 0) {
                             self.audioFileStream.fileSize = self.streamCache.contentLength;
@@ -313,6 +315,7 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
                     }
                     
                     if (error) {
+                        LBLog(@"%@",error);
                         [self updateAudioState:LBAudioStreamerStateError];
                         break;
                     }
@@ -327,19 +330,20 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
                         break;
                     }
                     
+                    //Seek
                     if (self.seekRequired) {
                         self.seekRequired = NO;
-                        [self updateAudioState:LBAudioStreamerStateWaitting];
+                        [self.streamCache closeNet];
                         self.timeOffSet = self.seekTime - self.audioOutputQueue.playedTime;
                         [self.audioBufferPool clean];
+                        [self.audioOutputQueue reset];
                         if (self.localMusic) {
                             [self.audioFile seekToTime:self.seekTime];
                         } else {
-                           SInt64 offset = [self.audioFileStream seekToTime:&_seekTime];
+                           SInt64 offset = [self.audioFileStream seekToTime:self.seekTime];
                             [self.streamCache seekToFileOffset:offset];
                         }
-                        self.seekRequired = NO;
-                        [self.audioOutputQueue reset];
+                        continue;
                     }
                     
                     //暂停
@@ -356,7 +360,6 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
                         [self.audioOutputQueue stop:YES];
                         self.stopRequired = NO;
                         self.started = NO;
-                        [self updateAudioState:LBAudioStreamerStateStop];
                         break;
                     }
                     
@@ -394,9 +397,8 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
         }
         
         while (self.audioOutputQueue.isRunning && self.state == LBAudioStreamerStateFlushing) {
-            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+            
         }
-
         //重置
         [self cleanUp];
     }
@@ -420,13 +422,13 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
     [self mutexDestory];
     
     //重置所有控制变量
-    [self updateAudioState:LBAudioStreamerStateStop];
     self.seekTime = 0;
     self.timeOffSet = 0;
     self.started = NO;
     self.stopRequired = NO;
     self.pauseRequired = NO;
     self.seekRequired = NO;
+    [self updateAudioState:LBAudioStreamerStateStop];
 }
 
 

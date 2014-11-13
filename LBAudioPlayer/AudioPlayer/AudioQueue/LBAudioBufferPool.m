@@ -8,6 +8,7 @@
 
 #import "LBAudioBufferPool.h"
 #import "LBParsedAudioData.h"
+#import "LBAudioDefine.h"
 
 @interface LBAudioBufferPool ()
 
@@ -50,6 +51,7 @@
                    descriptions:(AudioStreamPacketDescription **)descriptions{
     
     if (bufferSize == 0 || [self isEmpty]){
+        LBLog(@"bufferSize == 0 || [self isEmpty]");
         return nil;
     }
     

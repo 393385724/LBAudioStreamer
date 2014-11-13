@@ -35,7 +35,7 @@ typedef void (^LBAudioFileStreamBlock) (LBAudioFileStream *fileStream, NSArray *
 
 - (NSData *)fetchMagicCookie;
 
-- (SInt64)seekToTime:(NSTimeInterval *)time;
+- (SInt64)seekToTime:(NSTimeInterval)time;
 
 - (void)close;
 

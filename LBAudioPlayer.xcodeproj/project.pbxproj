@@ -68,7 +68,6 @@
 		906C477C1A10E80400C07050 /* NSString+AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+AudioPlayer.h"; sourceTree = "<group>"; };
 		906C477D1A10E80400C07050 /* NSString+AudioPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+AudioPlayer.m"; sourceTree = "<group>"; };
 		9071C6091A1231BB00DDF95E /* LBAudioDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LBAudioDefine.h; sourceTree = "<group>"; };
-		9071C60A1A12321B00DDF95E /* DDProgectDefinition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDProgectDefinition.h; sourceTree = "<group>"; };
 		908F69231A09FB1E008EFC1D /* LBAudioPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LBAudioPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		908F69271A09FB1E008EFC1D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		908F69281A09FB1E008EFC1D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -198,7 +197,6 @@
 			isa = PBXGroup;
 			children = (
 				90D19D3F1A13116400B0B369 /* AudioFilter */,
-				9071C60A1A12321B00DDF95E /* DDProgectDefinition.h */,
 				906C47581A10A95D00C07050 /* AudioPlayer */,
 				908F692A1A09FB1E008EFC1D /* AppDelegate.h */,
 				908F692B1A09FB1E008EFC1D /* AppDelegate.m */,

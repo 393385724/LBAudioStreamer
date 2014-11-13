@@ -69,7 +69,9 @@
 #pragma mark LifeCycle
 
 - (void)dealloc{
-    [self.metaCache updateMetaCache];
+    if (!self.hasCached) {
+        [self.metaCache updateMetaCache];  
+    }
     [self.writerFileHandle closeFile];
     [self.readerFileHandle closeFile];
 }
@@ -85,6 +87,7 @@
 - (instancetype)initWithURL:(NSURL *)url cachePath:(NSString *)filePath hasCached:(BOOL)cached{
     self =[super init];
     if (self) {
+        NSAssert(filePath, @"filePath 不能为nil");
         self.hasCached = cached;
         self.url= url;
         self.filePath = filePath;
@@ -94,8 +97,9 @@
         self.readerFileHandle = [NSFileHandle fileHandleForReadingAtPath:self.filePath];
         if (cached) {
             self.contentLength = [[[NSFileManager defaultManager] attributesOfItemAtPath:self.filePath error:nil] fileSize];
+        } else {
+            [self createFile];
         }
-        [self createFile];
     }
     return self;
 }
@@ -118,8 +122,11 @@
     self.bytesOffset = offset;
 }
 
+- (void)closeNet{
+    self.netRequest = nil;
+}
+
 - (NSData *)readLocaDataOfLength:(NSUInteger)length isEOF:(BOOL *)isEOF error:(NSError **)error{
-    NSLog(@"%llu,%llu",self.bytesOffset, self.contentLength);
     if (self.bytesOffset >= self.contentLength) {
         *isEOF = YES;
         return nil;
@@ -135,11 +142,15 @@
         
         if (startOffset <= self.bytesOffset && endOffset > self.bytesOffset) {
             //缓存中包含将要读取的数据，length长度以缓存长度为准
+            if (!self.readerFileHandle) {
+                self.readerFileHandle = [NSFileHandle fileHandleForReadingAtPath:self.filePath];
+            }
             [self.readerFileHandle seekToFileOffset:self.bytesOffset];
             data = [self.readerFileHandle readDataOfLength:MIN(length, (NSUInteger)(endOffset - self.bytesOffset))];
             break;
         }
     }
+    
     //无数据 请求
     if ([data length] == 0) {
         if (!self.netRequest) {
@@ -158,8 +169,7 @@
             [self writeCacheData:data fromOffset:self.bytesOffset];
             
         } else if(self.bytesOffset > self.contentLength){
-            
-            *error = [NSError errorWithDomain:@""code:1000 userInfo:nil];
+            *error = [NSError errorWithDomain:@"流媒体数据超了"code:100 userInfo:nil];
         }
     } else {
         self.netRequest = nil;
@@ -195,7 +205,6 @@
         self.writerFileHandle = [NSFileHandle fileHandleForUpdatingAtPath:self.filePath];
     }
     [self.writerFileHandle seekToFileOffset:fromOffset];
-    //TODO: 防止重合 暂时未做
     [self.metaCache updateRangeWithLocation:fromOffset length:cacheData.length];
     [self.writerFileHandle writeData:cacheData];
 }

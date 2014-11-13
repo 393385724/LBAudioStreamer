@@ -20,5 +20,7 @@
 
 - (void)seekToFileOffset:(unsigned long long)offset;
 
+- (void)closeNet;
+
 
 @end

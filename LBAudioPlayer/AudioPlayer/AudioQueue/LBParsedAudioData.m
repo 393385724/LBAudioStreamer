@@ -7,6 +7,7 @@
 //
 
 #import "LBParsedAudioData.h"
+#import "LBAudioDefine.h"
 
 @interface LBParsedAudioData ()
 
@@ -26,7 +27,7 @@
 - (instancetype)initWithBytes:(const void *)bytes
             packetDescription:(AudioStreamPacketDescription)packetDescription{
     if (bytes == NULL || packetDescription.mDataByteSize == 0){
-        NSLog(@"bytes == NULL || packetDescription.mDataByteSize == 0");
+        LBLog(@"bytes == NULL || packetDescription.mDataByteSize == 0");
         return nil;
     }
     self = [super init];
