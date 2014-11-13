@@ -8,6 +8,13 @@
 
 #import "AudioTest.h"
 #import <AudioToolbox/AudioToolbox.h>
+#import <AVFoundation/AVFoundation.h>
+
+@interface AudioTest ()
+
+@property (nonatomic, strong) NSMutableArray *audioMixParams;
+
+@end
 
 @implementation AudioTest
 
@@ -370,5 +377,4 @@ reterr:
     audioFormatPtr->mFormatFlags = kAudioFormatFlagsNativeEndian |
     kAudioFormatFlagIsPacked | kAudioFormatFlagIsSignedInteger;
 }
-
 @end

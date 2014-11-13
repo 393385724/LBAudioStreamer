@@ -235,7 +235,6 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
 }
 
 - (void)createAudioFileWithError:(NSError **)error{
-    error = nil;
     __weak LBAudioPlayer *weakSelf = self;
     if (!self.audioFile) {
         if (self.audioURL) {
@@ -243,7 +242,7 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
         } else {
             self.audioFile = [[LBAudioFile alloc] initWithFilePath:self.filePath fileType:[self hintForFileExtension:self.filePath.pathExtension] error:error];
         }
-        if (error) {
+        if (*error) {
             self.audioFile = nil;
         } else {
             self.audioFile.audioFileParsedBlock =  ^(LBAudioFile *audioFile, NSArray *audioDataArray){
@@ -254,7 +253,6 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
 }
 
 - (void)createAudioStreamWithError:(NSError **)error{
-    error = nil;
     __weak LBAudioPlayer *weakSelf = self;
     if (!self.audioFileStream) {
         self.audioFileStream = [[LBAudioFileStream alloc] initWithFileType:kAudioFileMP3Type error:error];
@@ -264,7 +262,7 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
         } else {
             self.streamCache = [[LBAudioStreamCache alloc] initWithURL:self.audioURL cachePath:self.filePath];
         }
-        if (error) {
+        if (*error) {
             self.audioFileStream = nil;
             self.streamCache = nil;
         } else {

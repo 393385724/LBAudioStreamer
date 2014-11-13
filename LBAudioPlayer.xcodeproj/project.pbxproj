@@ -32,6 +32,9 @@
 		90D19D421A13129E00B0B369 /* AudioTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 90D19D411A13129E00B0B369 /* AudioTest.m */; };
 		90D19D461A13304B00B0B369 /* origin.caf in Resources */ = {isa = PBXBuildFile; fileRef = 90D19D431A13304B00B0B369 /* origin.caf */; };
 		90D19D471A13304C00B0B369 /* pre.caf in Resources */ = {isa = PBXBuildFile; fileRef = 90D19D441A13304B00B0B369 /* pre.caf */; };
+		90D19D691A14751200B0B369 /* LBAudioMergerFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 90D19D681A14751200B0B369 /* LBAudioMergerFilter.m */; };
+		90D19D6C1A14752A00B0B369 /* LBAudioMixFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 90D19D6B1A14752A00B0B369 /* LBAudioMixFilter.m */; };
+		90D19D6E1A1487A900B0B369 /* sound.caf in Resources */ = {isa = PBXBuildFile; fileRef = 90D19D6D1A1487A900B0B369 /* sound.caf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,6 +96,11 @@
 		90D19D411A13129E00B0B369 /* AudioTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioTest.m; sourceTree = "<group>"; };
 		90D19D431A13304B00B0B369 /* origin.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = origin.caf; sourceTree = "<group>"; };
 		90D19D441A13304B00B0B369 /* pre.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = pre.caf; sourceTree = "<group>"; };
+		90D19D671A14751200B0B369 /* LBAudioMergerFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LBAudioMergerFilter.h; sourceTree = "<group>"; };
+		90D19D681A14751200B0B369 /* LBAudioMergerFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LBAudioMergerFilter.m; sourceTree = "<group>"; };
+		90D19D6A1A14752A00B0B369 /* LBAudioMixFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LBAudioMixFilter.h; sourceTree = "<group>"; };
+		90D19D6B1A14752A00B0B369 /* LBAudioMixFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LBAudioMixFilter.m; sourceTree = "<group>"; };
+		90D19D6D1A1487A900B0B369 /* sound.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sound.caf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -247,10 +255,15 @@
 		90D19D3F1A13116400B0B369 /* AudioFilter */ = {
 			isa = PBXGroup;
 			children = (
+				90D19D6D1A1487A900B0B369 /* sound.caf */,
 				90D19D431A13304B00B0B369 /* origin.caf */,
 				90D19D441A13304B00B0B369 /* pre.caf */,
 				90D19D401A13129E00B0B369 /* AudioTest.h */,
 				90D19D411A13129E00B0B369 /* AudioTest.m */,
+				90D19D6A1A14752A00B0B369 /* LBAudioMixFilter.h */,
+				90D19D6B1A14752A00B0B369 /* LBAudioMixFilter.m */,
+				90D19D671A14751200B0B369 /* LBAudioMergerFilter.h */,
+				90D19D681A14751200B0B369 /* LBAudioMergerFilter.m */,
 			);
 			path = AudioFilter;
 			sourceTree = "<group>";
@@ -339,6 +352,7 @@
 				908F69371A09FB1E008EFC1D /* LaunchScreen.xib in Resources */,
 				90D19D461A13304B00B0B369 /* origin.caf in Resources */,
 				90D19D471A13304C00B0B369 /* pre.caf in Resources */,
+				90D19D6E1A1487A900B0B369 /* sound.caf in Resources */,
 				908F69341A09FB1E008EFC1D /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -357,6 +371,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				90D19D6C1A14752A00B0B369 /* LBAudioMixFilter.m in Sources */,
 				906C47711A10A95D00C07050 /* LBAudioFile.m in Sources */,
 				90D19D421A13129E00B0B369 /* AudioTest.m in Sources */,
 				906C47771A10A95D00C07050 /* LBAudioOutputQueue.m in Sources */,
@@ -369,6 +384,7 @@
 				906C47791A10A95D00C07050 /* LBAudioPlayer.m in Sources */,
 				908F692C1A09FB1E008EFC1D /* AppDelegate.m in Sources */,
 				908F69731A0A45A1008EFC1D /* LBRootViewController.m in Sources */,
+				90D19D691A14751200B0B369 /* LBAudioMergerFilter.m in Sources */,
 				906C47751A10A95D00C07050 /* LBAudioStreamNetRequest.m in Sources */,
 				908F69711A0A45A1008EFC1D /* LBiPodMusicViewController.m in Sources */,
 				908F69291A09FB1E008EFC1D /* main.m in Sources */,
