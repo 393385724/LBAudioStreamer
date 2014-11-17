@@ -9,16 +9,21 @@
 #import "LBViewController.h"
 #import <CommonCrypto/CommonDigest.h>
 #import "LBAudioPlayer.h"
+#import "LBAudioRecoder.h"
 
 @interface LBViewController ()
 
-@property (nonatomic,strong) LBAudioPlayer *audioPlayer;
+@property (nonatomic, strong) LBAudioPlayer *audioPlayer;
+
+@property (nonatomic, strong) LBAudioRecoder *audioRecoder;
 
 @property (nonatomic, strong) UISlider *sliderView;
 
 @property (nonatomic, strong) UILabel *timeLable;
 
 @property (nonatomic, strong) NSTimer *timer;
+
+@property (nonatomic, strong) NSTimer *recoderTimer;
 
 @property (nonatomic, strong) UILabel *stateLabel;;
 
@@ -41,6 +46,7 @@
 
 - (void)dealloc{
     [self.audioPlayer stop];
+    [self.audioRecoder stop];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -100,7 +106,31 @@
     self.stateLabel.backgroundColor = [UIColor greenColor];
     [self.view addSubview:self.stateLabel];
     
+    UIButton *recoderButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 360, 100, 100)];
+    [recoderButton setTitle:@"录音" forState:UIControlStateNormal];
+    [recoderButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [recoderButton addTarget:self action:@selector(RecoderButtonPressed) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:recoderButton];
+    
+    UIButton *paseButton = [[UIButton alloc] initWithFrame:CGRectMake(100, 360, 100, 100)];
+    [paseButton setTitle:@"暂停录音" forState:UIControlStateNormal];
+    [paseButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [paseButton addTarget:self action:@selector(paseButtonPressed) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:paseButton];
+    
+    UIButton *recoderStopButton = [[UIButton alloc] initWithFrame:CGRectMake(200, 360, 100, 100)];
+    [recoderStopButton setTitle:@"停止录音" forState:UIControlStateNormal];
+    [recoderStopButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [recoderStopButton addTarget:self action:@selector(stopRecoderButtonPressed) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:recoderStopButton];
+
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioPlayerStateChange:) name:AudioPlayerStateChangeNotification object:nil];
+    
+    NSString *recoderPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"recoder.caf"];
+    self.audioRecoder = [[LBAudioRecoder alloc] initWithURL:recoderPath settings:nil error:nil];
+    
+    self.audioPlayer = [[LBAudioPlayer alloc] initWithFilePath:recoderPath];
 }
 
 
@@ -110,7 +140,31 @@
     self.timer = nil;
 }
 
+#pragma mark -
+#pragma mark recoder
 
+- (void)RecoderButtonPressed{
+    NSLog(@"RecoderButtonPressed");
+    [self.audioRecoder record];
+    self.recoderTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updatetime) userInfo:nil repeats:YES];
+}
+
+- (void)updatetime{
+    NSLog(@"updatetime: %f",self.audioRecoder.currentTime);
+}
+
+- (void)paseButtonPressed{
+    NSLog(@"paseButtonPressed");
+    [self.audioRecoder pause];
+}
+
+- (void)stopRecoderButtonPressed{
+    NSLog(@"stopRecoderButtonPressed");
+    [self.audioRecoder stop];
+}
+
+#pragma mark -
+#pragma mark  Play
 
 - (void)playButtonPressed{
     NSLog(@"playButtonPressed");

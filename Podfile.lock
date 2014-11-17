@@ -1,0 +1,12 @@
+PODS:
+  - libopus (1.1):
+    - libopus/float
+  - libopus/float (1.1)
+
+DEPENDENCIES:
+  - libopus
+
+SPEC CHECKSUMS:
+  libopus: 0a4c44b1dbad6e7f37d47c47b17d4170897c368b
+
+COCOAPODS: 0.34.4
