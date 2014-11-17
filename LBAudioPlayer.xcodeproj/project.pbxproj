@@ -18,6 +18,9 @@
 		906C47791A10A95D00C07050 /* LBAudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 906C476E1A10A95D00C07050 /* LBAudioPlayer.m */; };
 		906C477A1A10A95D00C07050 /* LBAudioSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 906C47701A10A95D00C07050 /* LBAudioSession.m */; };
 		906C477E1A10E80400C07050 /* NSString+AudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 906C477D1A10E80400C07050 /* NSString+AudioPlayer.m */; };
+		908A8BEC1A14B54000A711E7 /* LBAudioRecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 908A8BEB1A14B54000A711E7 /* LBAudioRecoder.m */; };
+		908A8BF01A14B67E00A711E7 /* LBAudioInputQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 908A8BEF1A14B67E00A711E7 /* LBAudioInputQueue.m */; };
+		908A8BF41A15A50B00A711E7 /* LBRecoderFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 908A8BF31A15A50B00A711E7 /* LBRecoderFile.m */; };
 		908F69291A09FB1E008EFC1D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 908F69281A09FB1E008EFC1D /* main.m */; };
 		908F692C1A09FB1E008EFC1D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 908F692B1A09FB1E008EFC1D /* AppDelegate.m */; };
 		908F69321A09FB1E008EFC1D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 908F69301A09FB1E008EFC1D /* Main.storyboard */; };
@@ -29,7 +32,6 @@
 		908F69721A0A45A1008EFC1D /* LBRemoteMusicViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 908F696B1A0A45A1008EFC1D /* LBRemoteMusicViewController.m */; };
 		908F69731A0A45A1008EFC1D /* LBRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 908F696D1A0A45A1008EFC1D /* LBRootViewController.m */; };
 		908F69741A0A45A1008EFC1D /* LBViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 908F696F1A0A45A1008EFC1D /* LBViewController.m */; };
-		90D19D421A13129E00B0B369 /* AudioTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 90D19D411A13129E00B0B369 /* AudioTest.m */; };
 		90D19D461A13304B00B0B369 /* origin.caf in Resources */ = {isa = PBXBuildFile; fileRef = 90D19D431A13304B00B0B369 /* origin.caf */; };
 		90D19D471A13304C00B0B369 /* pre.caf in Resources */ = {isa = PBXBuildFile; fileRef = 90D19D441A13304B00B0B369 /* pre.caf */; };
 		90D19D691A14751200B0B369 /* LBAudioMergerFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 90D19D681A14751200B0B369 /* LBAudioMergerFilter.m */; };
@@ -71,6 +73,12 @@
 		906C477C1A10E80400C07050 /* NSString+AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+AudioPlayer.h"; sourceTree = "<group>"; };
 		906C477D1A10E80400C07050 /* NSString+AudioPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+AudioPlayer.m"; sourceTree = "<group>"; };
 		9071C6091A1231BB00DDF95E /* LBAudioDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LBAudioDefine.h; sourceTree = "<group>"; };
+		908A8BEA1A14B54000A711E7 /* LBAudioRecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LBAudioRecoder.h; sourceTree = "<group>"; };
+		908A8BEB1A14B54000A711E7 /* LBAudioRecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LBAudioRecoder.m; sourceTree = "<group>"; };
+		908A8BEE1A14B67E00A711E7 /* LBAudioInputQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LBAudioInputQueue.h; sourceTree = "<group>"; };
+		908A8BEF1A14B67E00A711E7 /* LBAudioInputQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LBAudioInputQueue.m; sourceTree = "<group>"; };
+		908A8BF21A15A50B00A711E7 /* LBRecoderFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LBRecoderFile.h; sourceTree = "<group>"; };
+		908A8BF31A15A50B00A711E7 /* LBRecoderFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LBRecoderFile.m; sourceTree = "<group>"; };
 		908F69231A09FB1E008EFC1D /* LBAudioPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LBAudioPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		908F69271A09FB1E008EFC1D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		908F69281A09FB1E008EFC1D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -92,8 +100,6 @@
 		908F696D1A0A45A1008EFC1D /* LBRootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LBRootViewController.m; sourceTree = "<group>"; };
 		908F696E1A0A45A1008EFC1D /* LBViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LBViewController.h; sourceTree = "<group>"; };
 		908F696F1A0A45A1008EFC1D /* LBViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LBViewController.m; sourceTree = "<group>"; };
-		90D19D401A13129E00B0B369 /* AudioTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioTest.h; sourceTree = "<group>"; };
-		90D19D411A13129E00B0B369 /* AudioTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioTest.m; sourceTree = "<group>"; };
 		90D19D431A13304B00B0B369 /* origin.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = origin.caf; sourceTree = "<group>"; };
 		90D19D441A13304B00B0B369 /* pre.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = pre.caf; sourceTree = "<group>"; };
 		90D19D671A14751200B0B369 /* LBAudioMergerFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LBAudioMergerFilter.h; sourceTree = "<group>"; };
@@ -183,6 +189,35 @@
 			path = Category;
 			sourceTree = "<group>";
 		};
+		908A8BE91A14B41500A711E7 /* AudioRecoder */ = {
+			isa = PBXGroup;
+			children = (
+				908A8BF11A15A4FA00A711E7 /* RecoderFile */,
+				908A8BED1A14B64E00A711E7 /* AudioQueue */,
+				908A8BEA1A14B54000A711E7 /* LBAudioRecoder.h */,
+				908A8BEB1A14B54000A711E7 /* LBAudioRecoder.m */,
+			);
+			path = AudioRecoder;
+			sourceTree = "<group>";
+		};
+		908A8BED1A14B64E00A711E7 /* AudioQueue */ = {
+			isa = PBXGroup;
+			children = (
+				908A8BEE1A14B67E00A711E7 /* LBAudioInputQueue.h */,
+				908A8BEF1A14B67E00A711E7 /* LBAudioInputQueue.m */,
+			);
+			path = AudioQueue;
+			sourceTree = "<group>";
+		};
+		908A8BF11A15A4FA00A711E7 /* RecoderFile */ = {
+			isa = PBXGroup;
+			children = (
+				908A8BF21A15A50B00A711E7 /* LBRecoderFile.h */,
+				908A8BF31A15A50B00A711E7 /* LBRecoderFile.m */,
+			);
+			path = RecoderFile;
+			sourceTree = "<group>";
+		};
 		908F691A1A09FB1E008EFC1D = {
 			isa = PBXGroup;
 			children = (
@@ -204,6 +239,7 @@
 		908F69251A09FB1E008EFC1D /* LBAudioPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				908A8BE91A14B41500A711E7 /* AudioRecoder */,
 				90D19D3F1A13116400B0B369 /* AudioFilter */,
 				906C47581A10A95D00C07050 /* AudioPlayer */,
 				908F692A1A09FB1E008EFC1D /* AppDelegate.h */,
@@ -258,8 +294,6 @@
 				90D19D6D1A1487A900B0B369 /* sound.caf */,
 				90D19D431A13304B00B0B369 /* origin.caf */,
 				90D19D441A13304B00B0B369 /* pre.caf */,
-				90D19D401A13129E00B0B369 /* AudioTest.h */,
-				90D19D411A13129E00B0B369 /* AudioTest.m */,
 				90D19D6A1A14752A00B0B369 /* LBAudioMixFilter.h */,
 				90D19D6B1A14752A00B0B369 /* LBAudioMixFilter.m */,
 				90D19D671A14751200B0B369 /* LBAudioMergerFilter.h */,
@@ -373,10 +407,10 @@
 			files = (
 				90D19D6C1A14752A00B0B369 /* LBAudioMixFilter.m in Sources */,
 				906C47711A10A95D00C07050 /* LBAudioFile.m in Sources */,
-				90D19D421A13129E00B0B369 /* AudioTest.m in Sources */,
 				906C47771A10A95D00C07050 /* LBAudioOutputQueue.m in Sources */,
 				906C47731A10A95D00C07050 /* LBAudioStreamCache.m in Sources */,
 				906C477E1A10E80400C07050 /* NSString+AudioPlayer.m in Sources */,
+				908A8BF01A14B67E00A711E7 /* LBAudioInputQueue.m in Sources */,
 				906C47741A10A95D00C07050 /* LBAudioStreamMetaCache.m in Sources */,
 				908F69721A0A45A1008EFC1D /* LBRemoteMusicViewController.m in Sources */,
 				908F69741A0A45A1008EFC1D /* LBViewController.m in Sources */,
@@ -384,6 +418,8 @@
 				906C47791A10A95D00C07050 /* LBAudioPlayer.m in Sources */,
 				908F692C1A09FB1E008EFC1D /* AppDelegate.m in Sources */,
 				908F69731A0A45A1008EFC1D /* LBRootViewController.m in Sources */,
+				908A8BEC1A14B54000A711E7 /* LBAudioRecoder.m in Sources */,
+				908A8BF41A15A50B00A711E7 /* LBRecoderFile.m in Sources */,
 				90D19D691A14751200B0B369 /* LBAudioMergerFilter.m in Sources */,
 				906C47751A10A95D00C07050 /* LBAudioStreamNetRequest.m in Sources */,
 				908F69711A0A45A1008EFC1D /* LBiPodMusicViewController.m in Sources */,
