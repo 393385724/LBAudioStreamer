@@ -18,6 +18,11 @@
 #import "NSString+AudioPlayer.h"
 #import "LBAudioDefine.h"
 
+#import "LBStageAudioFilter.h"
+#import "LBCatAudioFilter.h"
+#import "LBCowAudioFilter.h"
+#import "LBAccelerateAudioFilter.h"
+
 NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNotification";
 
 @interface LBAudioPlayer (){
@@ -50,6 +55,8 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
 /**音频资源*/
 @property (nonatomic, copy) NSString *filePath;
 @property (nonatomic, strong) NSURL *audioURL;
+
+@property (nonatomic, strong) LBBaseAudioFilter *audioFilter;
 
 @end
 
@@ -114,7 +121,8 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
     self = [self init];
     if (self) {
         NSAssert(filePath, @"filePath 不能为空");
-        self.useAudioStream = YES;
+        self.useAudioStream = NO;
+        self.localMusic = YES;
         self.filePath = filePath;
     }
     return self;
@@ -128,6 +136,9 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
         self.started = NO;
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioSessionInterruptionNotification:) name:AVAudioSessionInterruptionNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioSessionRouteChangeNotification:) name:AVAudioSessionRouteChangeNotification object:nil];
+        
+        self.audioFilter = [[LBAccelerateAudioFilter alloc] init];
+
     }
     return self;
 }
@@ -286,7 +297,8 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
         while (![self shouldStopped] && self.started) {
             @autoreleasepool {
                 /*如果AudioFileStream已经readyToProducePackets 或者 缓存池中的数据小于最大缓存数据，则读取原始数据并且解析组装*/
-                if ( self.audioBufferPool.bufferPoolSize <= kAQdefaultBufferSize && !isEOF) {
+                if ( self.audioBufferPool.bufferPoolSize <= kAQdefaultBufferSize*100 && !isEOF) {
+
                     if (self.localMusic) {
                         
                         [self createAudioFileWithError:&error];
@@ -369,11 +381,22 @@ NSString *const AudioPlayerStateChangeNotification = @"AudioPlayerStateChangeNot
                                                                      packetCount:&packetCount
                                                                     descriptions:&desces];
                         if (packetCount != 0){
-                            BOOL succeed = [self.audioOutputQueue playWithParsedData:data
-                                                                         packetCount:packetCount
-                                                                  packetDescriptions:desces
-                                                                               isEOF:isEOF];
+                            
+                            LBAudioSampleType *buffer = (LBAudioSampleType *)malloc(packetCount * LBAudioSampleTypeSize);
+                            [data getBytes:buffer];
+                            UInt32 writtenSampleCount = [self.audioFilter doFilter:buffer sampleNumber:packetCount];
+                            if (writtenSampleCount == 0 && !isEOF) {
+                                free(buffer);
+                                continue;
+                            }
+                            BOOL succeed = [self.audioOutputQueue playWithParsedBytes:buffer
+                                                                               length:writtenSampleCount * LBAudioSampleTypeSize
+                                                                          packetCount:writtenSampleCount
+                                                                   packetDescriptions:desces
+                                                                                isEOF:isEOF];
+                            free(buffer);
                             free(desces);
+                            
                             if (!succeed) {
                                 [self updateAudioState:LBAudioStreamerStateError];
                                 break;

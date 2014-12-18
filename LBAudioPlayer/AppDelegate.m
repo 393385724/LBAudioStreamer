@@ -18,7 +18,7 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    LBRootViewController *vc = [[LBRootViewController alloc] init];
+    LBViewController *vc = [[LBViewController alloc] initWithUrl:nil filePath:[[NSBundle mainBundle] pathForResource:@"yuansheng" ofType:@"caf"]];
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:vc];
     self.window.rootViewController = navController;
     return YES;

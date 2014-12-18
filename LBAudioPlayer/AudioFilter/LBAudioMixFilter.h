@@ -7,12 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
+//测试
 
 @interface LBAudioMixFilter : NSObject
 
-+ (OSStatus)mixAudio:(NSString *)audioPath1
-            andAudio:(NSString *)audioPath2
-              toFile:(NSString *)outputPath
-  preferedSampleRate:(float)sampleRate;
+//+ (OSStatus)mixAudio:(NSString *)audioPath1
+//            andAudio:(NSString *)audioPath2
+//              toFile:(NSString *)outputPath
+//  preferedSampleRate:(float)sampleRate;
 
 @end

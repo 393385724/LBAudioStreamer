@@ -30,4 +30,11 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(LBAudioSession);
    return [[AVAudioSession sharedInstance] setCategory:category withOptions:options error:outError];
 }
 
+- (void)requestRecordPermission:(PermissionBlock)response{
+    
+    //over iOS 6
+    [[AVAudioSession sharedInstance] requestRecordPermission:response];
+    
+}
+
 @end

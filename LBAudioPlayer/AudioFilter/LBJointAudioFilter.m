@@ -1,18 +1,17 @@
 //
-//  LBAudioMergerFilter.m
+//  LBJointAudioFilter.m
 //  LBAudioPlayer
 //
-//  Created by lilingang on 14/11/13.
+//  Created by lilingang on 14/12/16.
 //  Copyright (c) 2014年 lilingang. All rights reserved.
 //
 
-#import "LBAudioMergerFilter.h"
+#import "LBJointAudioFilter.h"
 #import <AudioToolbox/AudioToolbox.h>
-#import "LBAudioDefine.h"
 
 const int defaultSampleRate = 16000.0;
 
-@implementation LBAudioMergerFilter
+@implementation LBJointAudioFilter
 
 + (BOOL)mergeAudioFilePaths:(NSArray *)inputFiles
                  outputPath:(NSString *)outputPath
@@ -25,12 +24,12 @@ const int defaultSampleRate = 16000.0;
     NSURL *outputURL = [NSURL URLWithString:outputPath];
     Float64 tmpRate = [self minmSampleRateWithInputFiles:inputFiles defaultSamplRate:sampleRate];
     if (tmpRate == 0) {
-        LBLog(@"比特率获取失败");
+        NSLog(@"比特率获取失败");
         return NO;
     }
     
     [self setDefaultAudioFormatFlags:&outputFileFormat sampleRate:tmpRate numChannels:numberOfChannels];
-
+    
     
     UInt32 flags = kAudioFileFlags_EraseFile;
     status = ExtAudioFileCreateWithURL((__bridge CFURLRef)outputURL, kAudioFileCAFType, &outputFileFormat, NULL, flags, &outputAudioFileRef);
@@ -39,7 +38,7 @@ const int defaultSampleRate = 16000.0;
         if (outputAudioFileRef){
             ExtAudioFileDispose(outputAudioFileRef);
         }
-        LBLog(@"ExtAudioFileCreateWithURL: %@",OSStatusCode(status));
+        //        NSLog(@"ExtAudioFileCreateWithURL: %@",OSStatusCode(status));
         return NO;
     }
     
@@ -75,7 +74,7 @@ const int defaultSampleRate = 16000.0;
         if (inputAudioFileRef){
             ExtAudioFileDispose(inputAudioFileRef);
         }
-        LBLog(@"ExtAudioFileOpenURL: %@",OSStatusCode(status));
+        //        NSLog(@"ExtAudioFileOpenURL: %@",OSStatusCode(status));
         return NO;
     }
     
@@ -85,7 +84,7 @@ const int defaultSampleRate = 16000.0;
         if (inputAudioFileRef){
             ExtAudioFileDispose(inputAudioFileRef);
         }
-        LBLog(@"ExtAudioFileOpenURL: %@",OSStatusCode(status));
+        //        NSLog(@"ExtAudioFileOpenURL: %@",OSStatusCode(status));
         return NO;
     }
     
@@ -94,7 +93,7 @@ const int defaultSampleRate = 16000.0;
         if (inputAudioFileRef){
             ExtAudioFileDispose(inputAudioFileRef);
         }
-        LBLog(@"ExtAudioFileSetProperty: %@",OSStatusCode(status));
+        //        NSLog(@"ExtAudioFileSetProperty: %@",OSStatusCode(status));
         return NO;
     }
     
@@ -116,7 +115,7 @@ const int defaultSampleRate = 16000.0;
         
         status = ExtAudioFileRead(inputAudioFileRef, &frameCount, &conversionBuffer);
         if (status){
-            NSLog(@"ExtAudioFileRead: %@",OSStatusCode(status));
+            //            NSLog(@"ExtAudioFileRead: %@",OSStatusCode(status));
             success = NO;
             break;
         }
@@ -127,12 +126,12 @@ const int defaultSampleRate = 16000.0;
         
         status = ExtAudioFileWrite(outputAudioFileRef, frameCount, &conversionBuffer);
         if (status){
-            NSLog(@"ExtAudioFileWrite: %@",OSStatusCode(status));
+            //            NSLog(@"ExtAudioFileWrite: %@",OSStatusCode(status));
             success = NO;
             break;
         }
     }
-
+    
     if (buffer != NULL){
         free(buffer);
     }
@@ -152,7 +151,7 @@ const int defaultSampleRate = 16000.0;
             UInt32	thePropertySize  = sizeof(tmpAudioFileFormat);
             status = ExtAudioFileOpenURL((__bridge CFURLRef)inputURL, &tmpAudioFileRef);
             if (status){
-                LBLog(@"ExtAudioFileOpenURL: %@",OSStatusCode(status));
+                //                NSLog(@"ExtAudioFileOpenURL: %@",OSStatusCode(status));
                 tmpRate = 0;
                 if (tmpAudioFileRef){
                     ExtAudioFileDispose(tmpAudioFileRef);
@@ -164,7 +163,7 @@ const int defaultSampleRate = 16000.0;
             status = ExtAudioFileGetProperty(tmpAudioFileRef, kExtAudioFileProperty_FileDataFormat, &thePropertySize, &tmpAudioFileFormat);
             if (status){
                 tmpRate = 0;
-                LBLog(@"ExtAudioFileGetProperty: %@",OSStatusCode(status));
+                //                NSLog(@"ExtAudioFileGetProperty: %@",OSStatusCode(status));
                 if (tmpAudioFileRef){
                     ExtAudioFileDispose(tmpAudioFileRef);
                 }

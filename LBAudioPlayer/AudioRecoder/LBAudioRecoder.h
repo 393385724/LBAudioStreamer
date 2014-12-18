@@ -29,7 +29,7 @@
 
 @property(nonatomic, readonly) float level;
 
-- (instancetype)initWithURL:(NSString *)filePath settings:(NSDictionary *)settings error:(NSError **)outError;
+- (instancetype)initWithFilePath:(NSString *)filePath settings:(NSDictionary *)settings error:(NSError **)outError;
 
 /* creates the file and gets ready to record. happens automatically on record. */
 - (BOOL)prepareToRecord;

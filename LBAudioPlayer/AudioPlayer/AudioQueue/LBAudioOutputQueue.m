@@ -136,17 +136,28 @@ static void LBAudioQueueIsRunningCallback(void *inUserData,
                packetCount:(UInt32)packetCount
         packetDescriptions:(AudioStreamPacketDescription *)packetDescriptions
                      isEOF:(BOOL)isEOF{
+   return [self playWithParsedBytes:[data bytes]
+                             length:[data length]
+                        packetCount:packetCount
+                 packetDescriptions:packetDescriptions
+                              isEOF:isEOF];
+}
+
+- (BOOL)playWithParsedBytes:(void const *)bytes
+                     length:(NSUInteger)length
+                packetCount:(UInt32)packetCount
+         packetDescriptions:(AudioStreamPacketDescription *)packetDescriptions
+                      isEOF:(BOOL)isEOF{
     self.isEOF = isEOF;
     
     //标记当前使用的buffer
     inUseBuffer[self.currentFillBufferIndex] = true;
     self.bufferUsed ++;
-    LBLog(@"playWithParsedData: %ld",(long)self.bufferUsed);
-
+    
     //给当前使用的buffer填充数据
     AudioQueueBufferRef buffer = audioQueueBuffer[self.currentFillBufferIndex];
-    memcpy(buffer->mAudioData, [data bytes], [data length]);
-    buffer->mAudioDataByteSize = (UInt32)[data length];
+    memcpy(buffer->mAudioData, bytes, length);
+    buffer->mAudioDataByteSize = (UInt32)length;
     
     //填充到AudioQueue
     OSStatus status = AudioQueueEnqueueBuffer(audioQueue,
@@ -328,7 +339,7 @@ static void LBAudioQueueIsRunningCallback(void *inUserData,
     } else {
         inUseBuffer[completeIndex] = false;
         self.bufferUsed--;
-        LBLog(@"handleBufferCompleteForQueue: %ld",(long)self.bufferUsed);
+//        LBLog(@"handleBufferCompleteForQueue: %ld",(long)self.bufferUsed);
         if (self.bufferUsed == 0 && !self.isEOF) {
             if (self.audioQueueBlock) {
                 self.audioQueueBlock(YES);

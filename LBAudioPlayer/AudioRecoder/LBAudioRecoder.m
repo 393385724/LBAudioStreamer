@@ -73,15 +73,15 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (instancetype)initWithURL:(NSString *)filePath
-                   settings:(NSDictionary *)settings
-                      error:(NSError **)outError{
+- (instancetype)initWithFilePath:(NSString *)filePath
+                        settings:(NSDictionary *)settings
+                           error:(NSError **)outError{
     self = [super init];
     if (self) {
         NSAssert(filePath, @"filePath not be nil");
         self.recoderFilePath = filePath;
         self.meteringEnabled = NO;
-        self.settings = [settings copy];
+        self.settings = settings;
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioSessionInterruptionNotification:) name:AVAudioSessionInterruptionNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioSessionRouteChangeNotification:) name:AVAudioSessionRouteChangeNotification object:nil];
     }

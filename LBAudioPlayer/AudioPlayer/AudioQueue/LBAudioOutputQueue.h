@@ -33,6 +33,11 @@ typedef void (^LBAudioOutputQueueBlock) (BOOL waitting);
                packetCount:(UInt32)packetCount
         packetDescriptions:(AudioStreamPacketDescription *)packetDescriptions
                      isEOF:(BOOL)isEOF;
+- (BOOL)playWithParsedBytes:(void const *)bytes
+                     length:(NSUInteger)length
+                packetCount:(UInt32)packetCount
+         packetDescriptions:(AudioStreamPacketDescription *)packetDescriptions
+                      isEOF:(BOOL)isEOF;
 
 - (BOOL)start;
 

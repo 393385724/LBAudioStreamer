@@ -127,10 +127,10 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioPlayerStateChange:) name:AudioPlayerStateChangeNotification object:nil];
     
-    NSString *recoderPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"recoder.caf"];
-    self.audioRecoder = [[LBAudioRecoder alloc] initWithURL:recoderPath settings:nil error:nil];
-    
-    self.audioPlayer = [[LBAudioPlayer alloc] initWithFilePath:recoderPath];
+//    NSString *recoderPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"recoder.caf"];
+////    self.audioRecoder = [[LBAudioRecoder alloc] initWithURL:recoderPath settings:nil error:nil];
+//    
+//    self.audioPlayer = [[LBAudioPlayer alloc] initWithFilePath:recoderPath];
 }
 
 

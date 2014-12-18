@@ -167,7 +167,7 @@ static SInt64 audioFileGetSizeProc(void *inClientData){
     
     UInt32 ioNumPackets = packetPerRead;
     UInt32 ioNumBytes = ioNumPackets * self.maxPacketSize;
-    void * outBuffer = (void *)malloc(ioNumBytes);
+    void * outBuffer = (void *)malloc(ioNumPackets);
     
     UInt32 descSize = sizeof(AudioStreamPacketDescription) * ioNumPackets;
     AudioStreamPacketDescription * outPacketDescriptions = (AudioStreamPacketDescription *)malloc(descSize);
@@ -193,6 +193,22 @@ static SInt64 audioFileGetSizeProc(void *inClientData){
     }
     
     if (ioNumPackets > 0){
+        if (self.fileType == kAudioFileCAFType) {
+            UInt32 packetSize = ioNumBytes / ioNumPackets;
+            for (int i = 0; i < ioNumPackets; i++){
+                @autoreleasepool {
+                    UInt32 packetOffset = packetSize * i;
+                    outPacketDescriptions[i].mStartOffset = packetOffset;
+                    outPacketDescriptions[i].mVariableFramesInPacket = 0;
+                    if (i == ioNumPackets - 1){
+                        outPacketDescriptions[i].mDataByteSize = ioNumBytes - packetOffset;
+                    } else {
+                        outPacketDescriptions[i].mDataByteSize = packetSize;
+                    }
+                }
+            }
+            
+        }
         self.packetOffset += ioNumPackets;
         NSMutableArray *parsedDataArray = [[NSMutableArray alloc] init];
         for (int i = 0; i < ioNumPackets; ++i){
@@ -365,6 +381,8 @@ static SInt64 audioFileGetSizeProc(void *inClientData){
     }
     self.maxPacketSize = maxPacketSize;
     
+    UInt32 fileFormatSize= sizeof(_fileType);
+    status = AudioFileGetProperty(_audioFileID, kAudioFilePropertyFileFormat, &fileFormatSize, &_fileType);
 }
 
 - (void)closeAudioFile{

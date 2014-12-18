@@ -22,4 +22,6 @@
 /* set session category with options */
 - (BOOL)setCategory:(NSString *)category withOptions: (AVAudioSessionCategoryOptions)options error:(NSError **)outError;
 
+- (void)requestRecordPermission:(PermissionBlock)response;
+
 @end
